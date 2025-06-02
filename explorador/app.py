@@ -6,10 +6,19 @@ app = Flask(__name__)
 @app.route("/")
 def index():
     alert_path = "/home/alertas_detectadas/alertas.txt"
-    alert_lines = []
+    alert_data = []
     if os.path.exists(alert_path):
         with open(alert_path, "r") as f:
-            alert_lines = f.readlines()
+            for line in f:
+                parts = line.strip().split()
+                if len(parts) >= 5:
+                    alert_data.append({
+                        'time': parts[0],
+                        'date': parts[1],
+                        'path': parts[2],
+                        'total_words': parts[3],
+                        'words_ending_a': parts[4]
+                    })
 
     backup_files = []
     base_dir = "/home"
@@ -29,8 +38,12 @@ def index():
         {% endfor %}
         </ul>
         <h2>Alertas detectadas:</h2>
-        <pre>{{ alert_lines | join('') }}</pre>
-    """, backup_files=backup_files, alert_lines=alert_lines)
+        <ul>
+        {% for alert in alert_data %}
+            <li>{{ alert.time }} {{ alert.date }} {{ alert.path }} cantidad de palabras : {{ alert.total_words }}, cantidad de palabras con a: {{ alert.words_ending_a }}</li>
+        {% endfor %}
+        </ul>
+    """, backup_files=backup_files, alert_data=alert_data)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
