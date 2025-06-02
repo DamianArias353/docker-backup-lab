@@ -1,16 +1,13 @@
 version: "3.9"
 
 services:
-  # 1. Servicio 'builder' → genera la imagen sólo una vez
   maquina-base:
     build:
       context: ./maquinas
       dockerfile: maquina-base.Dockerfile
-    image: maquina-base:latest        # <- etiqueta resultante
-    # Este contenedor no necesita arrancar; basta con que exista la imagen
+    image: maquina-base:latest
     entrypoint: ["true"]
 
-  # 2. Cada máquina usa esa imagen
   maquina1:
     image: maquina-base:latest
     container_name: maquina1
@@ -28,3 +25,23 @@ services:
     container_name: maquina3
     volumes:
       - ./data/maquina3:/home/users/documentos
+
+  backup:
+    build: ./backup
+    container_name: backup
+    volumes:
+      - ./backups:/home
+    depends_on:
+      - maquina1
+      - maquina2
+      - maquina3
+
+  explorador:
+    build: ./explorador
+    container_name: explorador
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./alertas:/home/alertas_detectadas
+    depends_on:
+      - backup
