@@ -41,5 +41,6 @@ services:
       - "8080:8080"
     volumes:
       - ./alertas:/home/alertas_detectadas
+      - ./backups:/home/backups
     depends_on:
       - backup
