@@ -4,6 +4,9 @@ FROM alpine:3.20
 # Herramientas básicas: servidor SSH, rsync y bash
 RUN apk add --no-cache openssh rsync bash
 
+# Claves de host para SSH (imprescindible)
+RUN ssh-keygen -A
+
 # Prepara directorio SSH (la clave pública se copiará luego)
 RUN mkdir -p /root/.ssh && chmod 700 /root/.ssh
 
